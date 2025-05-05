@@ -15,7 +15,7 @@ def get_trade_signal(symbol):
     
     # Memanggil OpenAI API untuk menghasilkan sinyal trading
     response = openai.Completion.create(
-        model="text-davinci-003",  # Pilih model GPT terbaru
+        model="text-davinci-003",  # Gunakan model GPT terbaru
         prompt=prompt,
         max_tokens=100,
         temperature=0.7
@@ -50,3 +50,4 @@ def display_ui():
 # Menjalankan aplikasi Streamlit
 if __name__ == "__main__":
     display_ui()
+
