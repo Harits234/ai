@@ -1,28 +1,29 @@
-
-import streamlit as st
 import openai
+import streamlit as st
+from dotenv import load_dotenv
+import os
 
-# Inisialisasi OpenAI API dengan kunci API Anda
-openai.api_key = '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'
+# Memuat file .env untuk mengambil API key secara aman
+load_dotenv()
 
-# Fungsi untuk mendapatkan sinyal trading dari ChatGPT
-def get_trade_signal(prompt):
+# API key Anda
+openai.api_key = "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"  # API key yang Anda berikan
+
+# Fungsi untuk mendapatkan sinyal trading dari GPT-3
+def get_trade_signal(symbol):
+    prompt = f"Analyze the market for {symbol} and suggest whether to Buy, Sell, or Hold based on current market conditions."
+    
+    # Memanggil OpenAI API untuk menghasilkan sinyal trading
     response = openai.Completion.create(
-        engine="text-davinci-003",  # Pilih model GPT yang sesuai
+        model="text-davinci-003",  # Pilih model GPT terbaru
         prompt=prompt,
         max_tokens=100,
-        temperature=0.7  # Nilai 0.7 memberikan tingkat variasi yang lebih tinggi dalam respons
+        temperature=0.7
     )
-    message = response.choices[0].text.strip()
-    return message
+    
+    return response.choices[0].text.strip()
 
-# Fungsi untuk memproses sinyal trading
-def process_signal(symbol):
-    prompt = f"Please analyze the market for {symbol} and suggest whether to Buy, Sell, or Hold based on the current market conditions."
-    signal = get_trade_signal(prompt)
-    return signal
-
-# Tampilan UI dengan Streamlit
+# Menampilkan antarmuka dengan Streamlit
 def display_ui():
     st.title("AI Trading Signal System")
     st.header("AI Trading Signal")
@@ -30,9 +31,9 @@ def display_ui():
     # Pilih simbol trading
     symbol = st.selectbox("Choose a Symbol", ["XAUUSD", "EURUSD", "GBPUSD", "USDJPY"])
 
-    # Tombol untuk mendapatkan sinyal trading dari ChatGPT
+    # Tombol untuk mendapatkan sinyal trading dari GPT
     if st.button('Get AI Trading Signal'):
-        signal = process_signal(symbol)
+        signal = get_trade_signal(symbol)
         st.write(f"**AI Suggestion for {symbol}:** {signal}")
 
         # Menampilkan saran dari AI, jika ada
