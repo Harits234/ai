@@ -6,10 +6,10 @@ import os
 # Memuat file .env untuk mengambil API key secara aman
 load_dotenv()
 
-# API key Anda
-openai.api_key = "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"  # API key yang Anda berikan
+# Mengambil API key dari file .env
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Fungsi untuk mendapatkan sinyal trading dari GPT-3
+# Fungsi untuk mendapatkan sinyal trading
 def get_trade_signal(symbol):
     prompt = f"Analyze the market for {symbol} and suggest whether to Buy, Sell, or Hold based on current market conditions."
     
