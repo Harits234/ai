@@ -7,15 +7,15 @@ import os
 load_dotenv()
 
 # Mengambil API key dari file .env (gunakan API key terbaru Anda)
-openai.api_key = "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"
+openai.api_key = "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"
 
 # Fungsi untuk mendapatkan sinyal trading
 def get_trade_signal(symbol):
     prompt = f"Analyze the market for {symbol} and suggest whether to Buy, Sell, or Hold based on current market conditions."
     
-    # Memanggil OpenAI API untuk menghasilkan sinyal trading
+    # Memanggil OpenAI API untuk menghasilkan sinyal trading menggunakan model GPT-4
     response = openai.Completion.create(
-        model="text-davinci-003",  # Gunakan model GPT terbaru yang didukung oleh OpenAI
+        model="gpt-4",  # Gunakan model GPT-4 yang lebih baru
         prompt=prompt,
         max_tokens=100,
         temperature=0.7
