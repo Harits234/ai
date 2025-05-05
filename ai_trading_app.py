@@ -1,4 +1,4 @@
-import openai
+import requests
 import streamlit as st
 from dotenv import load_dotenv
 import os
@@ -6,22 +6,31 @@ import os
 # Memuat file .env untuk mengambil API key secara aman
 load_dotenv()
 
-# Mengambil API key dari file .env
-openai.api_key = os.getenv("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")  # Pastikan API key valid
+# Mengambil API key DeepSeek dari file .env
+DEEPSEEK_API_KEY = os.getenv("sk-6b255993d4a9416e8f72cfd717daf43d")  # API key DeepSeek
 
-# Fungsi untuk mendapatkan sinyal trading
+# Fungsi untuk mendapatkan sinyal trading dari DeepSeek
 def get_trade_signal(symbol):
-    prompt = f"Analyze the market for {symbol} and suggest whether to Buy, Sell, or Hold based on current market conditions."
+    url = "https://platform.deepseek.com/api_keys"  # URL API DeepSeek (Contoh, pastikan URL benar)
     
-    # Memanggil OpenAI API untuk menghasilkan sinyal trading menggunakan model GPT-4
-    response = openai.Completion.create(
-        model="gpt-4",  # Pastikan model yang digunakan adalah gpt-4, bukan model lama
-        prompt=prompt,
-        max_tokens=100,
-        temperature=0.7
-    )
+    headers = {
+        "Authorization": f"Bearer {DEEPSEEK_API_KEY}",  # Header untuk API key
+        "Content-Type": "application/json"
+    }
     
-    return response.choices[0].text.strip()
+    payload = {
+        "symbol": symbol,
+        "timeframe": "5m",  # Sesuaikan dengan timeframe yang Anda pilih
+        "signal_type": "trading"  # Tipe sinyal yang Anda butuhkan (bisa jadi 'buy', 'sell', 'hold')
+    }
+    
+    response = requests.post(url, json=payload, headers=headers)
+    
+    if response.status_code == 200:
+        data = response.json()
+        return data['forecast']  # Asumsi bahwa response mengembalikan sinyal dalam key 'forecast'
+    else:
+        return "Error: Unable to fetch data from DeepSeek."
 
 # Menampilkan antarmuka dengan Streamlit
 def display_ui():
@@ -31,7 +40,7 @@ def display_ui():
     # Pilih simbol trading
     symbol = st.selectbox("Choose a Symbol", ["XAUUSD", "EURUSD", "GBPUSD", "USDJPY"])
 
-    # Tombol untuk mendapatkan sinyal trading dari GPT
+    # Tombol untuk mendapatkan sinyal trading dari DeepSeek
     if st.button('Get AI Trading Signal'):
         signal = get_trade_signal(symbol)
         st.write(f"**AI Suggestion for {symbol}:** {signal}")
