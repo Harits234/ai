@@ -1,80 +1,51 @@
 
 import streamlit as st
 import openai
-import MetaTrader5 as mt5
 
-# Initialize OpenAI API
-openai.api_key = 'your-openai-api-key'
+# Inisialisasi OpenAI API dengan kunci API Anda
+openai.api_key = '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'
 
-# Function to get trade signal from ChatGPT
+# Fungsi untuk mendapatkan sinyal trading dari ChatGPT
 def get_trade_signal(prompt):
     response = openai.Completion.create(
-        engine="text-davinci-003",  # Use appropriate engine
+        engine="text-davinci-003",  # Pilih model GPT yang sesuai
         prompt=prompt,
-        max_tokens=100
+        max_tokens=100,
+        temperature=0.7  # Nilai 0.7 memberikan tingkat variasi yang lebih tinggi dalam respons
     )
     message = response.choices[0].text.strip()
     return message
 
-# Initialize MetaTrader5 connection
-def initialize_mt5():
-    if not mt5.initialize():
-        print("MetaTrader 5 initialization failed")
-        mt5.shutdown()
-    else:
-        print("MetaTrader 5 initialized successfully")
+# Fungsi untuk memproses sinyal trading
+def process_signal(symbol):
+    prompt = f"Please analyze the market for {symbol} and suggest whether to Buy, Sell, or Hold based on the current market conditions."
+    signal = get_trade_signal(prompt)
+    return signal
 
-# Function to open trade in MT5
-def open_trade(symbol, order_type, volume, price, sl, tp):
-    request = {
-        "action": mt5.TRADE_ACTION_DEAL,
-        "symbol": symbol,
-        "volume": volume,
-        "type": order_type,
-        "price": price,
-        "sl": sl,
-        "tp": tp,
-        "deviation": 10,
-        "magic": 234000,
-        "comment": "Streamlit AI Trading",
-        "type_filling": mt5.ORDER_FILLING_IOC,
-        "type_time": mt5.ORDER_TIME_GTC
-    }
-    result = mt5.order_send(request)
-    if result.retcode != mt5.TRADE_RETCODE_DONE:
-        print(f"Error executing trade: {result.retcode}")
-    else:
-        print("Trade executed successfully")
-
-# Streamlit user interface
+# Tampilan UI dengan Streamlit
 def display_ui():
-    st.title("AI Trading Super Canggih")
+    st.title("AI Trading Signal System")
     st.header("AI Trading Signal")
-    
-    symbol = st.selectbox("Choose Symbol", ["XAUUSD", "EURUSD", "GBPUSD"])
-    
+
+    # Pilih simbol trading
+    symbol = st.selectbox("Choose a Symbol", ["XAUUSD", "EURUSD", "GBPUSD", "USDJPY"])
+
+    # Tombol untuk mendapatkan sinyal trading dari ChatGPT
     if st.button('Get AI Trading Signal'):
-        prompt = f"Analyze the market for {symbol} and suggest a buy or sell signal."
-        signal = get_trade_signal(prompt)
-        st.write("AI Suggestion:", signal)
-        
+        signal = process_signal(symbol)
+        st.write(f"**AI Suggestion for {symbol}:** {signal}")
+
+        # Menampilkan saran dari AI, jika ada
         if "BUY" in signal:
-            price = SymbolInfoDouble(symbol, SYMBOL_ASK)
-            sl = price - 10 * _Point  # Stop Loss
-            tp = price + 20 * _Point  # Take Profit
-            open_trade(symbol, mt5.ORDER_TYPE_BUY, 0.1, price, sl, tp)
+            st.write("AI suggests opening a **BUY** order.")
         elif "SELL" in signal:
-            price = SymbolInfoDouble(symbol, SYMBOL_BID)
-            sl = price + 10 * _Point  # Stop Loss
-            tp = price - 20 * _Point  # Take Profit
-            open_trade(symbol, mt5.ORDER_TYPE_SELL, 0.1, price, sl, tp)
-    
-    st.header("Market Overview")
-    st.write("Real-time market data can be displayed here using MT5 API.")
-    
+            st.write("AI suggests opening a **SELL** order.")
+        else:
+            st.write("AI suggests **HOLD** the current position.")
+
     st.sidebar.header("Settings")
     st.sidebar.write("Adjust trading parameters here.")
 
+# Menjalankan aplikasi Streamlit
 if __name__ == "__main__":
     display_ui()
-    
