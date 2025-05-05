@@ -6,8 +6,8 @@ import os
 # Memuat file .env untuk mengambil API key secara aman
 load_dotenv()
 
-# Mengambil API key dari file .env
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Mengambil API key dari file .env (gunakan API key terbaru Anda)
+openai.api_key = "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"
 
 # Fungsi untuk mendapatkan sinyal trading
 def get_trade_signal(symbol):
@@ -15,7 +15,7 @@ def get_trade_signal(symbol):
     
     # Memanggil OpenAI API untuk menghasilkan sinyal trading
     response = openai.Completion.create(
-        model="text-davinci-003",  # Pastikan menggunakan model yang valid
+        model="text-davinci-003",  # Gunakan model GPT terbaru yang didukung oleh OpenAI
         prompt=prompt,
         max_tokens=100,
         temperature=0.7
